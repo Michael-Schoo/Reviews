@@ -1,0 +1,65 @@
+{% extends 'items_grid.html' %}
+
+{% block content%}
+
+
+<main>
+    <div class="container p-5 mb-4">
+        <h1>Welcome to Reviews!</h1>
+        <p>
+            Below you should see some examples of 
+            <a href="/collections/all">collections</a> 
+            and 
+            <a href="/items/all">items</a>.
+            <br>
+            Don't forget to
+            <a href="/register">register</a> or
+            <a href="/login">login</a> to get started!
+        </p>
+
+
+        <div id="carouselExampleCaptions" class="carousel slide ">
+            <div class="carousel-indicators">
+                {% for item in carousel_items %}
+                <button type="button" data-bs-target="#carouselExampleCaptions"  aria-label="Slide {{ loop.index }}"
+                    data-bs-slide-to="{{ loop.index0 }}" {{' class=active aria-current=true' if loop.first else ''}} >
+                </button>
+                {% endfor %}
+
+            </div>
+            <div class="carousel-inner">
+                {% for item in carousel_items %}
+                <div class="carousel-item {{' active' if loop.first else '' }} bg-dark">
+                    <img src="{{item.get_image_url()}}"
+                        class="d-block w-100 bg-dark opacity-50" alt="...">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>{{ item.name }}</h5>
+                        <p>
+                            <span class="badge bg-success rounded-pill me-2">
+                                {{item.type or item.tag or 'tag'}}
+                            </span>
+                            {{ item.description }}
+
+                        </p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+    </div>
+    </div>
+</main>
+
+
+
+{% endblock%}

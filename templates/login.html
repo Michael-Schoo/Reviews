@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block meta%}
+    <title>Login</title>
+{% endblock%}
+
+{% block content%}
+
+<main class="form-signin w-100 m-auto text-center">
+    <form action="/login" method="post">
+        <img class="mb-4" src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72" height="57">
+        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+
+        <div class="form-floating">
+            <input type="email" class="form-control {{ 'is-invalid' if invalid_creds else ''}}" id="floatingInput" name="email" placeholder="name@example.com" value="{{prev_data.email if prev_data else ''}}">
+            <label for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control {{ 'is-invalid' if invalid_creds else ''}}" id="floatingPassword" name="password" placeholder="Password" value="{{prev_data.password if prev_data else '' }}">
+            <label for="floatingPassword">Password</label>
+                {% if invalid_creds %}
+                <div class="invalid-feedback" style="padding-bottom: 10px;">
+                    Invalid email or password
+                </div>
+                {% endif %}
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+                <input type="checkbox" name="remember_me" value="remember-me"> Remember me
+            </label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+        <p class="mt-5 mb-3 text-body-secondary">© 2017–2023</p>
+    </form>
+</main>
+{% endblock%}

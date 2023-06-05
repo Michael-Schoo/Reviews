@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+
+{% block meta%}
+<title>New Item | Reviews</title>
+{% endblock%}
+
+
+{% block content%}
+
+
+<main>
+    <div class="container p-5 mb-4">
+
+        <form action="/item" method="post" class="container" style="max-width: 500px">
+            <h1 class="h3 mb-3 fw-normal">Make a new Item!</h1>
+
+            <div class="mb-3 text-start">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="The Hunger Games" required>
+            </div>
+
+            <div class="mb-3 text-start">
+                <label for="floatingInput">Description</label>
+                <textarea type="text" class="form-control" id="floatingInput" name="description"
+                    placeholder="A movie about..." required rows="3"></textarea>
+            </div>
+
+            <div class="mb-3 text-start">
+                <label for="image_url" class="form-label">Image URL</label>
+                <input type="text" class="form-control" id="image_url" name="image_url"
+                    placeholder="https://google.com/images/image.png" required>
+            </div>
+
+            <div class="mb-3 text-start">
+                <label for="item_type" class="form-label">Type</label>
+                <select class="form-select" id="item_type" name="type" required>
+                    <option value="movie">Movie</option>
+                    <option value="book">Book</option>
+                    <option value="song">Song</option>
+                </select>
+            </div>
+
+            <div class="mb-3 text-start" id="director-form">
+                <label for="director" class="form-label">Director</label>
+                <input type="text" class="form-control" id="director" name="director" placeholder="Francis Lawrence"
+                    required>
+            </div>
+
+            <div class="mb-3 text-start" id="year-form">
+                <label for="year" class="form-label">Year</label>
+                <input type="text" class="form-control" id="year" name="year" placeholder="2012" required>
+            </div>
+
+            <div class="mb-3 text-start" id="length-form">
+                <label for="length" class="form-label">Length</label>
+                <input type="text" class="form-control" id="length" name="length" placeholder="142 (in minutes)"
+                    required>
+            </div>
+
+            <div class="mb-3 text-start" id="author-form">
+                <label for="author" class="form-label">Author</label>
+                <input type="text" class="form-control" id="author" name="author" placeholder="Suzanne Collins"
+                    required>
+            </div>
+
+            <div class="mb-3 text-start" id="language-form">
+                <label for="language" class="form-label">Language</label>
+                <input type="text" class="form-control" id="language" name="language" placeholder="English" required>
+            </div>
+
+            <div class="mb-3 text-start" id="country-form">
+                <label for="country" class="form-label">Country</label>
+                <input type="text" class="form-control" id="country" name="country" placeholder="United States"
+                    required>
+            </div>
+
+            <div class="mb-3 text-start" id="artist-form">
+                <label for="artist" class="form-label">Artist</label>
+                <input type="text" class="form-control" id="artist" name="artist" placeholder="Taylor Swift" required>
+            </div>
+
+            <button class="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
+        </form>
+
+    </div>
+</main>
+
+<!-- script to show/hide the correct form elements -->
+<script>
+    function disable_element(element_id) {
+        const element = document.getElementById(element_id);
+        element.hidden = true;
+        element.children[1].required = false;
+    }
+
+    function enable_element(element_id) {
+        const element = document.getElementById(element_id);
+        element.hidden = false;
+        element.children[1].required = true;
+    }
+
+    function showAndHide(type) {
+
+        // hide all the forms
+        disable_element("director-form");
+        disable_element("year-form");
+        disable_element("length-form");
+        disable_element("author-form");
+        disable_element("language-form");
+        disable_element("country-form");
+        disable_element("artist-form");
+
+
+        // show the correct form
+        if (type == "movie") {
+            enable_element("director-form");
+            enable_element("year-form");
+            enable_element("length-form");
+        } else if (type == "book") {
+            enable_element("author-form");
+            enable_element("year-form");
+            enable_element("language-form");
+            enable_element("country-form");
+        } else if (type == "song") {
+            enable_element("artist-form");
+            enable_element("year-form");
+            enable_element("length-form");
+        }
+    }
+
+    // show the correct form
+    document.getElementById("item_type").addEventListener("change", function () {
+        // get the value of the select
+        const type = document.getElementById("item_type").value;
+        showAndHide(type);
+    });
+
+
+    // if query string set, show the correct form
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    if (type != null && type != 'all') {
+        showAndHide(type);
+        document.getElementById("item_type").value = type;
+
+    } else {
+        showAndHide("movie");
+        document.getElementById("item_type").value = "movie";
+    }
+
+</script>
+
+
+
+
+
+
+{% endblock%}

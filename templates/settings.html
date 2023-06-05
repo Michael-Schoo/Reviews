@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block meta%}
+<title>Settings | Reviews</title>
+{% endblock%}
+
+
+{% block content%}
+
+<main>
+    <div class="container pt-3 text-start" style="max-width: 500px">
+        <h1 class="text-center">Settings</h1>
+
+        <!-- main card  for user info -->
+        <!-- card  underneath for password -->
+        <!-- card  underneath for 2fa -->
+
+        <!-- main card with the data (with inputs)  and button -->
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">User Info</h5>
+                <form action="/settings/details" method="POST" class="">
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Username</label>
+                        <div class="input-group">
+                            <div class="input-group-text no-right-border">@</div>
+                            <input type="text" value="{{user.username}}" class="form-control" id="username"
+                                aria-describedby="username" name="username" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email address</label>
+                        <input type="email" value="{{user.email}}" class="form-control" id="email"
+                            aria-describedby="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" value="{{user.name}}" class="form-control" id="name" aria-describedby="name"
+                            name="name" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- card for password -->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Change Password</h5>
+                <form action="/settings/password" method="POST">
+                    <div class="mb-3">
+                        <label for="old_password" class="form-label">Old Password</label>
+                        <input type="password" class="form-control" id="old_password" aria-describedby="old_password"
+                            name="old_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="new_password" aria-describedby="new_password"
+                            name="new_password" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="new_password_confirm" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="new_password_confirm"
+                            aria-describedby="new_password_confirm" name="new_password_confirm" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Change Password</button>
+                </form>
+            </div>
+
+        </div>
+
+        <!-- card for 2fa with an image-->
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title">Two Factor Authentication</h5>
+                <p class="card-text">
+                    Scan this QR code with your authenticator app to enable 2FA.
+                    <!-- if already set up, warn -->
+                    {% if user.otp_secret %}
+                    <i>
+                        <br>By scanning this QRCode, your previous 2fa won't work
+                    </i>
+                    {% endif %}
+
+                </p>
+                <!-- <img src="{{qrcode( qr_url )}}" width="150px" alt="..."> -->
+                <!-- above image but centered -->
+                <div class="d-flex justify-content-center">
+                    <img src="{{qrcode( qr_url )}}" width="150px" alt="...">
+                </div>
+
+                <form action="/settings/2fa" method="POST">
+                    <div class="mb-3">
+                        <label for="2fa_code" class="form-label">2FA Code</label>
+                        <input type="text" class="form-control" id="2fa_code" aria-describedby="2fa_code"
+                            name="2fa_code" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" aria-describedby="password"
+                            name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Enable 2FA</button>
+                </form>
+            </div>
+        </div>
+
+
+
+    </div>
+    <footer class="pt-3 mt-4 pb-2 text-body-secondary border-top">
+        &copy; 2023
+    </footer>
+
+</main>
+
+
+{% endblock%}
+
+<!-- bootstrap profile page (can change username and password - needs password and 2fa if made ) -->

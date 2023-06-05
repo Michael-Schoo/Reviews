@@ -1,0 +1,358 @@
+{% extends 'base.html' %}
+
+{% block meta%}
+<title>{{collection.name}} | Reviews</title>
+<meta name="description" content="{{collection.description}}">
+{% endblock%}
+
+{% block content%}
+
+<main>
+    <div class="container">
+
+        <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+            <div class="container-fluid py-5">
+                <h1 class="display-5 fw-bold">
+                    {{ collection.name }}
+                </h1>
+                <div class="fs-6 pb-1" style="margin-top: -10px">
+
+                    {% if collection.forked_from_id %}
+                    <span class="badge bg-primary ms-2">Forked from</span>
+                    <a href="{{collection.forked_from.get_url_with_name()}}"
+                        class="ms-2">{{ collection.forked_from.name }}</a>
+                    {% elif collection.is_fork %}
+                    <span class="badge bg-primary ms-2" data-bs-toggle="tooltip" data-bs-title="Fork deleted">
+                        Forked
+                    </span>
+                    {% endif %}
+
+                </div>
+                <p class="col-md-8 fs-4 text-center w-100">{{ collection.description }}</p>
+
+                <!-- the image of the user and their username -->
+                <div class="pb-4 d-flex justify-content-center fs-5     ">
+                    <a href="{{collection.user.get_url_with_name()}}" class="d-flex align-items-center ps-1">
+                        <img src="{{collection.user.get_gravatar()}}" height="30px" width="30px"
+                            class="rounded-circle border">
+                        <span class="fs-5" data-bs-toggle="tooltip" data-bs-title="{{collection.user.name}}">
+                            @{{ collection.user.username }}
+                        </span>
+                    </a>
+                </div>
+
+
+                <div class="d-flex justify-content-center">
+                    <form action="/collection/{{collection.id}}/fork" method="POST">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="bi-collection-fill"></i>
+                            Fork
+                        </button>
+                    </form>
+                    <!-- if user created it -->
+                    {% if collection.user.id == current_user.id or current_user.admin%}
+                    <!-- delete button -->
+                    <button type="button" class="ms-2 btn btn-outline-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal">
+                        <i class="bi-trash"></i>
+                        Delete
+                    </button>
+                    <!-- edit button -->
+                    <button type="button" class="ms-2 btn btn-outline-primary" data-bs-toggle="modal"
+                        data-bs-target="#editModal">
+                        <i class="bi-pencil-square"></i>
+                        Edit
+                    </button>
+                    {% else %}
+                    <!-- report button -->
+                    <a href="{{collection.get_url_with_name()}}/report" class="ms-2 btn btn-outline-primary">Report</a>
+                    {% endif %}
+
+                    {% if current_user and collection.user_likes(current_user.id or 0) %}
+                    <!-- Like button -->
+                    <form action="/collection/{{collection.id}}/unlike" method="POST">
+                        <button type="submit" class="btn btn-warning ms-2">
+                            <i class="bi-star-fill"></i> Unlike <span
+                                class="badge text-bg-light">{{collection.get_number_of_likes()}}</span>
+                        </button>
+                    </form>
+                    {% else %}
+                    <!-- unlike button -->
+                    <form action="/collection/{{collection.id}}/like" method="POST">
+                        <button type="submit" class="btn btn-warning ms-2">
+                            <i class="bi-star"></i> Like <span
+                                class="badge text-bg-light">{{collection.get_number_of_likes()}}</span>
+                        </button>
+                    </form>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+
+        <!-- the items in the collection -->
+        <div class="row align-items-md-stretch">
+            <div class="col-md-8 text-start">
+                <div class="h-100 p-3 text-bg-dark rounded-3 bg-body-tertiary">
+                    <!-- make a card for each item -->
+                    {% for item in collection.items %}
+                    <div class="col-md-8 p-2 w-100" id="item-{{item.id}}">
+                        <div class="card p-2">
+                            <img src="{{item.get_image_url()}}" height="250px" class="card-img-top object-fit-cover"
+                                alt="...">
+                            <div class="card-body">
+                                <h5 class="card-title">
+                                    {{item.name}}
+                                    <span class="badge bg-success rounded-pill ms-2">
+                                        {{item.type}}
+                                    </span>
+                                </h5>
+                                <p class="card-text">
+                                    {{item.description}}
+                                </p>
+                                <!-- read more button -->
+                                <a href="{{item.get_url_with_name()}}" class="btn btn-primary" data-bs-toggle="tooltip"
+                                    data-bs-title="Read more about this item">
+                                    Read more
+                                </a>
+
+                                <!-- delete button (if admin or owner of collection) -->
+                                {% if collection.user.id == current_user.id or current_user.admin %}
+                                <button class="btn btn-outline-danger ms-2" onclick="removeItem('{{item.id}}')">
+                                    Remove
+                                </button>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <!-- button for adding more - links to /items -->
+                    {% if collection.user.id == current_user.id %}
+                    <div class="col-md-8 p-2 w-100 text-black">
+
+                        <!-- if no items, show message as well -->
+                        {% if collection.items | length == 0 %}
+                        <p class="text-center">You have no items in this collection. Add some!</p>
+                        {% endif %}
+                        <a href="/items" class="btn btn-primary mt-2 w-100">
+                            <i class="bi-plus"></i>
+                            Add more
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div>
+                    <!-- show forks of the collection -->
+                    <div class="h-100 p-4 bg-body-tertiary border rounded-3">
+                        <h2>Forks ({{collection.forks | length}})</h2>
+                        {% if collection.forks | length %}
+                        <div id="forks-list" class="overflow-auto" style="max-height: 250px">
+
+                            {% for fork in collection.forks %}
+
+                            <div class="p-2 mt-2 border rounded text-start bg-white">
+                                <!-- mini round icon for user -->
+                                <a href="{{fork.user.get_url_with_name()}}">
+
+                                    <img src="{{fork.user.get_gravatar()}}" height="25px" width="25px"
+                                        class="rounded-circle border" alt="..." data-bs-toggle="tooltip"
+                                        data-bs-title="@{{fork.user.username}}">
+                                </a>
+
+                                <a href="{{fork.get_url_with_name()}}" class="ms-2">{{fork.name}}</a>
+
+
+                            </div>
+
+                            {% endfor %}
+                        </div>
+
+                        {% else %}
+                        <div>
+                            <p class="text-center">No forks yet</p>
+                            <!-- but you can make one (with button) -->
+                            <div class="d-flex justify-content-center">
+                                <form action="/collection/{{collection.id}}/fork" method="POST">
+                                    <button class="btn btn-primary" type="submit">You can be the first!</button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <br>
+                </div>
+                <br>
+                <div class="sticky-top" style="top: 20px">
+                    <!-- comments of the collection -->
+                    <div class="h-100 p-3 bg-body-tertiary border rounded-3" style="min-height: 300px">
+                        <h2>Comments ({{collection.comments | length}})</h2>
+
+                        {% if current_user %}
+                        <form action="/collection/{{collection.id}}/comment" method="POST">
+                            <div class="mb-3">
+                                <textarea class="form-control" id="comment" name="comment"
+                                    placeholder="Your comment on this collection..."
+                                    onfocus="this.rows=3; document.getElementById('review-new').hidden=false"
+                                    rows="1"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3" id="review-new"
+                                hidden>Submit</button>
+                        </form>
+                        {% else %}
+                        <div class="mb-3">
+                            <p class="text-center">You must be logged in to comment</p>
+                        </div>
+                        {% endif %}
+
+                        <div id="comments-list" class="overflow-auto" style="max-height: 400px;">
+
+                            {% for comment in collection.comments | reverse %}
+
+                            <div class="p-2 mt-2 border rounded text-start bg-white" id="comment-{{comment.id}}">
+                                <b class="font-weight-bold">
+                                    <!-- if current_user made comment or admin -->
+                                    {% if current_user.admin or current_user.id == comment.user.id %}
+                                    <button class="btn btn-outline-danger float-end btn-sm" type="button"
+                                        onclick="removeComment('{{comment.id}}')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    {% endif %}
+
+                                    <a href="{{comment.user.get_url_with_name()}}" data-bs-toggle="tooltip"
+                                        data-bs-title="{{comment.user.name}}">
+
+                                        <img src="{{comment.user.get_gravatar()}}" height="25px" width="25px"
+                                            class="rounded-circle border" alt="...">
+                                        <span>@{{comment.user.username}}</span>
+                                    </a>
+                                    <br>
+                                    <time class="ms-1 fst-italic" data-bs-toggle="tooltip"
+                                        data-bs-title='{{ comment.timestamp.strftime("%x %X")}} UTC'
+                                        datetime="{{comment.timestamp}}">
+                                        {{ moment(comment.timestamp).fromNow() }}
+                                    </time>
+                                </b>
+                                <p class="text-break">
+                                    {{comment.comment}}
+                                </p>
+
+                            </div>
+                            {% else %}
+                            <p>
+                                No comments yet. Be the first by clicking above!
+                            </p>
+
+                            {% endfor %}
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="pt-3 mt-4 pb-2 text-body-secondary border-top">
+            &copy; 2023
+        </footer>
+    </div>
+</main>
+
+
+<!-- MODALS -->
+<!-- Edit modal -->
+<div class="modal fade text-start" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <form class="modal-dialog" action="/collection/{{collection.id}}/edit" method="post">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Edit Collection</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- change name and description -->
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="col-form-label">Name:</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{collection.name}}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="description" class="col-form-label">Description:</label>
+                        <textarea class="form-control" id="description"
+                            name="description">{{collection.description}}</textarea>
+                    </div>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<!-- are you sure you want to delete modal -->
+<div class="modal fade text-start" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <form class="modal-dialog" action="/collection/{{collection.id}}/delete" method="POST">
+        <div class="modal-content text-start">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">Are you sure you want to delete this collection?
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="submit" class="btn btn-danger">Yes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- you need to login to  -->
+
+
+<script>
+    tooltip() 
+</script>
+
+<script>
+    function removeItem(id) {
+        elem = document.getElementById('item-' + id);
+        elem.remove();
+
+        fetch('/collection/{{collection.id}}/item/' + id, {
+            method: 'DELETE'
+        }).then(res => {
+            if (!res.ok) {
+                window.location.reload();
+            }
+        });
+    }
+
+
+
+    function removeComment(comment_id) {
+        document.getElementById(`comment-${comment_id}`).remove();
+
+        fetch(`/collection/{{collection.id}}/comment/${comment_id}`, {
+            method: 'DELETE'
+        }).then(res => {
+            if (!res.ok) {
+                window.location.reload();
+            }
+        });
+    }
+
+    const myModal = new bootstrap.Modal(document.getElementById('editModal'), {});
+    if (window.location.hash === '#edit') {
+        myModal.show();
+    }
+
+
+</script>
+{% endblock%}

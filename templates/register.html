@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block content%}
+
+<main class="form-signup w-100 m-auto text-center">
+    <form action="/register" method="post">
+        <img class="mb-4" src="https://getbootstrap.com/docs/5.3/assets/brand/bootstrap-logo.svg" alt="" width="72"
+            height="57">
+        <h1 class="h3 mb-3 fw-normal">Please register</h1>
+
+        <div class="form-floating">
+            <input type="text" class="form-control {{ 'is-invalid' if invalid_name else ''}}" id="name" name="name"
+                placeholder="John Doe" value="{{prev_data.name if prev_data else '' }}" required>
+            <label for="name">Name</label>
+            {% if invalid_name %}
+            <div class="invalid-feedback" style="padding-bottom: 10px;">
+                {% if invalid_name == 'required' %}
+                Name is required
+                {% else %}
+                Invalid name?
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="input-group form-floating ">
+
+            <div class="input-group-prepend">
+                <span class="input-group-text" id="inputGroupPrepend3">@</span>
+            </div>
+            <input type="username" class="form-control {{ 'is-invalid' if invalid_username else ''}}" id="username"
+                name="username" placeholder="Username" value="{{prev_data.username if prev_data else '' }}" required
+                >
+                <!--                 pattern="^[a-zA-Z0-9_]{3,20}$" -->
+            <label for="username" style="margin-left: 2.5rem; z-index: 10;">Username</label>
+            {% if invalid_username %}
+            <div class="invalid-feedback" style="padding-bottom: 10px;">
+                {% if invalid_username == 'invalid_format' %}
+                Username must be between 3 and 20 characters and can only contain letters, numbers and underscores
+                {% elif invalid_username == 'already_registered' %}
+                Username already registered
+                {% elif invalid_username == 'required' %}
+                Username is required
+                {% else %}
+                Invalid username?
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="form-floating">
+            <input type="email" class="form-control {{ 'is-invalid' if invalid_email else ''}}" id="floatingInput"
+                name="email" placeholder="name@example.com" value="{{prev_data.email if prev_data else ''}}" required>
+            <label for="floatingInput">Email address</label>
+            {% if invalid_email %}
+            <div class="invalid-feedback" style="padding-bottom: 10px;">
+                {% if invalid_email == 'already_registered' %}
+                Email already registered
+                {% elif invalid_email == 'invalid_format' %}
+                Invalid email
+                {% elif invalid_email == 'required' %}
+                Email is required
+                {% else %}
+                Invalid email?
+                {% endif %}
+            </div>
+            {% endif %}
+
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control {{ 'is-invalid' if invalid_password else ''}}"
+                id="floatingPassword" name="password" placeholder="Password"
+                value="{{prev_data.password if prev_data else '' }}" required>
+            <label for="floatingPassword">Password</label>
+            {% if invalid_password %}
+            <div class="invalid-feedback" style="padding-bottom: 10px;">
+                {% if invalid_password == 'invalid_format' %}
+                Password must be between 8 and 50 characters long
+                {% elif invalid_password == 'required' %}
+                Password is required
+                {% else %}
+                Invalid password?
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign up</button>
+        <p class="mt-5 mb-3 text-body-secondary">© 2017–2023</p>
+    </form>
+</main>
+{% endblock%}

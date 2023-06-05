@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+<!-- this file is for both items and collections -->
+
+{% block content%}
+
+<div class="container py-3 ">
+    <h1>{{info_data.sub_name}}</h1>
+
+    <!-- show more button -->
+    {% if info_data.make_new %}
+    <!-- Mobile -->
+    <div class="d-block d-sm-none">
+        <a href="{{info_data.make_new.link}}" class="btn btn-primary">{{info_data.make_new.short_text}}</a>
+    </div>
+
+    <!-- Desktop -->
+    <div class="d-none d-sm-flex d-flex justify-content-end" style="margin-top: -51px;">
+        <a href="{{info_data.make_new.link}}" class="btn btn-primary">{{info_data.make_new.short_text}}</a>
+    </div>
+
+</div>
+{% endif %}
+
+<div class="d-flex flex-wrap text-start justify-content-evenly">
+
+    <!-- make the item card for every item -->
+    {% for item in items %}
+    <a href="{{item.get_url_with_name()}}" class="card card-item text-decoration-none m-3 mb-5">
+        {% if not item.type %}
+        <i class="p-2 pt-1 text-end bi text-white {{'bi-star-fill' if current_user and item.user_likes(current_user.id) else 'bi-star'}}"
+            style="margin-bottom: -36px; z-index: 10;">
+            <span class="ms-1 fst-normal">{{item.get_number_of_likes()}}</span>
+        </i>
+        {% else %}
+        <i class="bi bi-collection p-2 pt-1 text-end text-white" style="margin-bottom: -36px; z-index: 10;">
+            <span class="ms-1 fst-normal">{{item.collections | length}}</span>
+        </i>
+        {% endif %}
+        <img src="{{item.get_image_url()}}" height="250px" class="card-img-top object-fit-cover" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">
+                <span class="badge bg-success rounded-pill me-2">
+                    {{item.type or item.tag or 'tag'}}
+                </span>
+
+                <span>{{item.name}}</span>
+            </h5>
+        </div>
+    </a>
+    {% endfor %}
+
+    <!-- a show more card with a plus icon as the image (svg) and the text underneath saying "show more" -->
+    {% if info_data.make_new %}
+    <a href="{{info_data.make_new.link}}" class="card card-item text-decoration-none m-3 mb-5">
+
+        <div class="row align-items-center h-100" style="min-height: 200px;">
+
+            <img src="https://icons.getbootstrap.com/assets/icons/plus-circle.svg" height="100px" width="100px"
+                class="col card-img-top" alt="Plus Icon">
+        </div>
+
+        <div class="card-body text-center">
+            <h5 class="card-title">
+                <b class="text-center font-weight-bold">{{info_data.make_new.text}}</b>
+            </h5>
+        </div>
+
+    </a>
+
+    {% endif %}
+
+
+</div>
+<footer class="pt-3 mt-4 pb-2 text-body-secondary border-top">
+    &copy; 2023
+</footer>
+
+{% endblock%}

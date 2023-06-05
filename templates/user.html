@@ -1,0 +1,65 @@
+{% extends 'items_grid.html' %}
+
+{% block meta%}
+<title>@{{user.username}} | Reviews</title>
+{% endblock%}
+
+
+{% block content%}
+<div class="container">
+
+    <div class="p-5 mb-4 bg-body-tertiary rounded-3">
+        <div class="container-fluid py-5">
+
+            <h1 class="display-5 fw-bold">
+                <img src="{{user.get_gravatar()}}" height="75px" width="75px" class="rounded-circle border" alt="...">
+                @{{ user.username }}
+            </h1>
+            <p class="col-md-8 fs-4 text-center w-100">
+                {% if user.admin %}
+                <span class="fs-6 pb-2 badge bg-danger rounded-pill">Admin</span>
+                {% endif %}
+                {{ user.name }}
+            </p>
+
+            <div class="d-flex justify-content-center">
+                {% if current_user.id == user.id %}
+                <a href="/settings" class="ms-2 btn btn-outline-primary">
+                    Edit
+                </a>
+                {% else %}
+                <a href="{{user.get_url_with_name()}}/report" class="ms-2 btn btn-outline-primary">Report</a>
+                {% endif %}
+                {% if current_user.admin %}
+                <button type="button" class="ms-2 btn btn-outline-danger" data-bs-toggle="modal"
+                    data-bs-target="#deleteModal">
+                    Delete
+                </button>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- delete modal -->
+<div class="modal fade text-start" id="deleteModal" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
+    <form class="modal-dialog" action="/user/{{user.id}}/delete" method="POST">
+        <div class="modal-content text-start">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalLabel">
+                    Are you sure you want to delete this user?
+                </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="submit" class="btn btn-danger">Yes</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+{% endblock%}

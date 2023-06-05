@@ -1,0 +1,26 @@
+{% extends 'items_grid.html' %}
+
+{% block meta%}
+<title>Collections | Reviews</title>
+{% endblock%}
+
+
+{% block content%}
+<main>
+    <div class="container pt-3">
+        <h1>Collections</h1>
+
+        <!-- Mobile -->
+        <div class="d-block d-sm-none">
+            <a href="/collections/new" class="btn btn-primary">New Collection</a>
+        </div>
+
+        <!-- Desktop -->
+        <div class="d-none d-sm-flex d-flex justify-content-end" style="margin-top: -51px;">
+            <a href="/collections/new" class="btn btn-primary">New Collection</a>
+        </div>
+</main>
+
+
+
+{% endblock%}

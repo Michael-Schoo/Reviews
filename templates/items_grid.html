@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+<!-- this file is for both items and collections -->
+
+{% block content2%}
+
+<div class="container py-3">
+
+    <div class="container-fluid py-2 text-start">
+        {% for group in groups %}
+
+        <h2 class="font-weight-light">
+            {% if groups[group].link %}
+            <a href="{{groups[group].link}}">{{groups[group].name}}</a>
+            {% else %}
+            {{groups[group].name}}
+            {% endif %}
+        </h2>
+
+        <div class="d-flex flex-row flex-nowrap overflow-x-scroll">
+            {% for item in groups[group]['items'] %}
+            <a href="{{item.get_url_with_name()}}" class="card card-item text-decoration-none">
+                {% if not item.type %}
+                <i class="p-2 pt-1 text-end bi text-white {{'bi-star-fill' if current_user and item.user_likes(current_user.id) else 'bi-star'}}"
+                    style="margin-bottom: -36px; z-index: 10;">
+                    <span class="ms-1 fst-normal">{{item.get_number_of_likes()}}</span>
+                </i>
+                {% else %}
+                <i class="bi bi-collection p-2 pt-1 text-end text-white" style="margin-bottom: -36px; z-index: 10;">
+                    <span class="ms-1 fst-normal">{{item.collections | length}}</span>
+                </i>
+                {% endif %}
+                <img src="{{item.get_image_url()}}" height="250px" class="card-img-top object-fit-cover" alt="...">
+
+                <div class="card-body">
+                    <h5 class="card-title">
+
+                        <span>{{item.name}}</span>
+                    </h5>
+                    <p class="card-text">
+                        <span class="badge bg-success rounded-pill me-2">
+                            {{item.type or item.tag or 'tag'}}
+                        </span>
+                        <!-- if a fork -->
+                        {% if item.is_fork %}
+                        <span class="badge bg-warning text-dark rounded-pill me-2">
+                            Fork
+                        </span>
+                        <!-- <span class="badge bg-warning text-dark rounded-pill me-2">
+                            {{item.fork}}
+                        </span> -->
+                        {% endif %}
+                    </p>
+                </div>
+            </a>
+            {% endfor %}
+            {% if groups[group].show_more %}
+            <a href="{{groups[group].show_more.link}}" class="card card-item text-decoration-none">
+
+                <div class="row align-items-center" style="height: 250px;">
+
+                    <img src="https://icons.getbootstrap.com/assets/icons/{{groups[group].show_more.icon}}.svg"
+                        height="100px" width="100px" class="col card-img-top"
+                        alt="{{groups[group].show_more.icon}} Icon">
+                </div>
+
+                <!-- a show more card with a plus icon as the image (svg) and the text underneath saying "show more" -->
+                <div class="card-body text-center">
+                    <h5 class="card-title">
+                        <b class="text-center font-weight-bold">{{groups[group].show_more.text}}</b>
+                    </h5>
+                </div>
+
+            </a>
+
+
+            {% endif %}
+
+        </div>
+        <br>
+        {% endfor %}
+    </div>
+    
+    <footer class="pt-3 mt-2 pb-2 text-body-secondary border-top">
+        &copy; 2023
+    </footer>
+
+
+
+</div>
+{% endblock%}

@@ -1,0 +1,23 @@
+{% extends 'items_grid.html' %}
+
+{% block content%}
+<main>
+    <div class="container pt-3">
+        <h1>Items</h1>
+
+        {% if current_user.admin %}
+        <!-- Mobile -->
+        <div class="d-block d-sm-none">
+            <a href="/items/new" class="btn btn-primary">New Item</a>
+        </div>
+
+        <!-- Desktop -->
+        <div class="d-none d-sm-flex d-flex justify-content-end" style="margin-top: -51px;">
+            <a href="/items/new" class="btn btn-primary">New Item</a>
+        </div>
+        {% endif %}
+</main>
+
+
+
+{% endblock%}
